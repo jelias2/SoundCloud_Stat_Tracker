@@ -34,8 +34,6 @@ def determine_new_songs( comparison_list ):
 
             song = songObject(track_info.title, item.id, track_info.user['username'])  # Create a song object
 
-            song.add_information()
-
             # Loop through to see if it already contains the new song before adding it
             found_in_oldSongList = "false"
             for x in comparison_list:
@@ -100,9 +98,7 @@ def write_new_songs():
                 csv_writer.writerow([key] + value)
 
 
-def main():
-
-    # determine new data from soundcloud that is not in spreadsheet
+def read_pickle_file():
     f = open("save.p", 'r')  # Pickle file to load a save data
     if (os.stat("save.p")).st_size != 0:  # Check to make sure the file is not empty
         while 1:
@@ -112,19 +108,38 @@ def main():
                 break
     f.close()
 
-    determine_new_songs( oldSongList )
 
-    print "New Song List: ", newSongList
-    print "Old Song List: ", oldSongList
+def write_pickle_file(full_list):
 
-    print ' '
+    if newSongList.__len__() == 0:
+        print 'No new songs to add'
 
     for x in newSongList:
         print 'Adding ', x.title, ' to pickle file'
 
-    f = open("save.p", 'a')   # Save song_list data to a pickle file
-    pickle.dump(newSongList, f)
+    f = open("save.p", 'w')   # Save song_list data to a pickle file
+    pickle.dump(full_list, f)
     f.close()
+
+
+def main():
+
+    final_song_list = []
+    # Read in the stored songs
+    read_pickle_file()
+    # Determine the new likes from soundCloud, oldSongList is passed in as a comparison
+    determine_new_songs(oldSongList)
+
+    print ' '
+    print "New Song List: ", newSongList
+    print "Old Song List: ", oldSongList
+    print ' '
+    final_song_list = oldSongList + newSongList
+    # Collect new information for all the songs
+    for song in final_song_list:
+        song.add_information()
+    print " "
+    write_pickle_file(final_song_list)
 
     # write the new songs to the spreadsheet
     # write_nw_songs()
