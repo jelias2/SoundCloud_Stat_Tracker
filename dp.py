@@ -18,8 +18,6 @@ oldSongList = []
 
 
 def determine_new_songs( comparison_list ):
-
-    print "Finding new songs..."
     # Create dictionary of Links
     # The song ID maps to a string of all of the info
     for item in my_likes:
@@ -143,6 +141,8 @@ def main():
     for song in final_song_list:
         song.add_information()
     print " "
+
+    print "Finding new songs..."
     write_pickle_file(final_song_list)
 
     print_all_dates(final_song_list)
@@ -160,11 +160,3 @@ if __name__ == '__main__':
 
     print ' '
     print("Completed")
-
-
-
-# THINGS FOR YOU TO DO
-# 1) Figure out how to read in the old spreadsheet
-# 2) Figure out how to pull in more than X number of likes at once, all of them
-# 3) Figure out how to calculate the "movements" from (1) and the new data (along with it, how to add more columns, etc)
-# 4) Get your own clientID and use that instead
