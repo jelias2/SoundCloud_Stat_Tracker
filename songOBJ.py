@@ -9,7 +9,7 @@ client = soundcloud.Client(client_id="rvUzdXNHlC53yQD3OcXOGxUUs3kMniRO")
 my_likes = client.get('/resolve', url='http://soundcloud.com/jacob-elias-5/likes')
 
 
-class SongOBJ:
+class songObject:
     # Class to hold information about each song
 
     def __init__(self, title, song_id, artist):
@@ -40,23 +40,20 @@ class SongOBJ:
             except AttributeError:
                 pass
 
+    def print_dates(self):
+            # Method to show all the dates in a song
+            print "Song ", self.title, " contains info from ", self.song_data.keys()
 
-def print_dates(self):
-    # Method to show all the dates in a song
-    print "Song ", self.title, " contains info from ", self.song_data.keys()
+    def get_play_count(self, date):
+        #  Method to get the specific play count from a song
+        info = self.song_data.get(date)
 
+        return info[1]
 
-def get_play_count(self, date):
-    #  Method to get the specific play count from a song
-    info = self.song_data.get(date)
-
-    return info[1]
-
-
-def get_favorite_count(self, date):
-    # Method to get the favorites count"
-    info = self.song_data.get(date)
-    return info[0]
+    def get_favorite_count(self, date):
+        # Method to get the favorites count"
+        info = self.song_data.get(date)
+        return info[0]
 
 
 def main():
@@ -73,7 +70,7 @@ def main():
             song_id = item.id
             song_title = track_info.title
 
-            song = SongOBJ(username, song_id, song_title, )
+            song = songObject(username, song_id, song_title, )
 
             song.add_information()
 
@@ -94,9 +91,9 @@ def main():
         print "Title: ", song.title
         print "Song ID: ", song.id
         print "Artist: ", song.artist
-        print "Favorites: ", get_favorite_count(song, date)
-        print "Plays: ", get_play_count(song, date)
-        print_dates(song)
+        print "Favorites: ", song.get_favorite_count(date)
+        print "Plays: ", song.get_play_count(date)
+
 
 
 if __name__ == '__main__':
@@ -107,12 +104,9 @@ if __name__ == '__main__':
 
     f = open("save.p", 'r')   # Pickle file to load a save data
 
-    if( os.stat("save.p")).st_size != 0:
+    if(os.stat("save.p")).st_size != 0:  # Check to make sure the file is not empty
         song_list = pickle.load(f)
     f.close()
-
-    #for song in song_list:
-      #  print song.title
 
     main()
 

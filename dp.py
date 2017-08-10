@@ -1,8 +1,9 @@
 import soundcloud
 import csv
-import time
+import cPickle as pickle
 import sys
-from songOBJ import SongOBJ
+import os
+from songOBJ import songObject
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -16,7 +17,7 @@ newSongList = []
 oldSongList = []
 
 
-def determine_new_songs():
+def determine_new_songs( comparison_list ):
 
     print "Finding new songs..."
     # Create dictionary of Links
@@ -31,38 +32,52 @@ def determine_new_songs():
                              track_info.favoritings_count,
                              track_info.playback_count]
 
+            song = songObject(track_info.title, item.id, track_info.user['username'])  # Create a song object
+
+            song.add_information()
+
+            # Loop through to see if it already contains the new song before adding it
+            found_in_oldSongList = "false"
+            for x in comparison_list:
+                if x.id == song.id:
+                    found_in_oldSongList = "true"
+                    break
+
+            # If the song was not found, add it to new songList
+            if found_in_oldSongList == "false":
+                newSongList.append(song)
 
         except AttributeError:
             pass
 
-    ##Compare
-    with open('/Users/JacobElias/Desktop/Projects/SoundProgram/data2.csv') as csvfile:
-
-        # readCSV is a list that can be accessed readCSV[row][col]
-        read_csv = list(csv.reader(csvfile, delimiter=','))
-
-        # iterate through all of thedef determineNewSongs ():
-        for obj in data.keys():
-            # bool to determine if the songID is found, resets for each new obj in dict
-            _found_in_spreadsheet = "false"
-
-            # iterate throught the CSV
-            for row in read_csv:
-
-                # avoid Value error if parsing a string
-                try:
-                    int(row[0])
-                except ValueError:
-                    continue
-
-                if int(row[0]) == obj:
-                    oldSongList.append(obj)
-                    _found_in_spreadsheet = "True"
-                    break
-
-            # If the sound if not found in spread sheet at it to new song list
-            if _found_in_spreadsheet == "false":
-                newSongList.append(obj)
+    #  Compare
+    # with open('/Users/JacobElias/Desktop/Projects/SoundProgram/data2.csv') as csvfile:
+    #
+    #     # readCSV is a list that can be accessed readCSV[row][col]
+    #     read_csv = list(csv.reader(csvfile, delimiter=','))
+    #
+    #     # iterate through all of thedef determineNewSongs ():
+    #     for obj in data.keys():
+    #         # bool to determine if the songID is found, resets for each new obj in dict
+    #         _found_in_spreadsheet = "false"
+    #
+    #         # iterate throught the CSV
+    #         for row in read_csv:
+    #
+    #             # avoid Value error if parsing a string
+    #             try:
+    #                 int(row[0])
+    #             except ValueError:
+    #                 continue
+    #
+    #             if int(row[0]) == obj:
+    #                 oldSongList.append(obj)
+    #                 _found_in_spreadsheet = "True"
+    #                 break
+    #
+    #         # If the sound if not found in spread sheet at it to new song list
+    #         if _found_in_spreadsheet == "false":
+    #             newSongList.append(obj)
 
 
 def write_new_songs():
@@ -85,17 +100,34 @@ def write_new_songs():
                 csv_writer.writerow([key] + value)
 
 
-
 def main():
+
     # determine new data from soundcloud that is not in spreadsheet
-    determine_new_songs()
+    f = open("save.p", 'r')  # Pickle file to load a save data
+    if (os.stat("save.p")).st_size != 0:  # Check to make sure the file is not empty
+        while 1:
+            try:
+                oldSongList.extend(pickle.load(f))
+            except EOFError:
+                break
+    f.close()
+
+    determine_new_songs( oldSongList )
 
     print "New Song List: ", newSongList
     print "Old Song List: ", oldSongList
 
-    # write the new songs to the spreadsheet
-    write_new_songs()
+    print ' '
 
+    for x in newSongList:
+        print 'Adding ', x.title, ' to pickle file'
+
+    f = open("save.p", 'a')   # Save song_list data to a pickle file
+    pickle.dump(newSongList, f)
+    f.close()
+
+    # write the new songs to the spreadsheet
+    # write_nw_songs()
 
 if __name__ == '__main__':
 
