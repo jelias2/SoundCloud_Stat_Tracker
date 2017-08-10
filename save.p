@@ -801,4 +801,23 @@ I322833885
 sg11
 VA man
 p299
+sba(isongOBJ
+songObject
+p300
+(dp301
+g4
+(dp302
+S'10-08-2017'
+p303
+(lp304
+I497371
+aI22120187
+assg8
+VTravis Scott
+p305
+sg10
+I322834576
+sg11
+VGreen & Purple f/Playboi Carti
+p306
 sba.

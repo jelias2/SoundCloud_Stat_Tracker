@@ -78,24 +78,19 @@ def determine_new_songs( comparison_list ):
     #             newSongList.append(obj)
 
 
-def write_new_songs():
+def write_new_songs(songlist, date):
     print' '
     print "Writing new songs to spreadsheet..."
-    print ' '
-    with open('/Users/JacobElias/Desktop/Projects/SoundProgram/data2.csv', 'a+') as csvfile:
+    csvfile = open('/Users/JacobElias/Desktop/Projects/SoundProgram/data2.csv', 'w')
 
-        #  readCSV is a list that can be accessed readCSV[row][col]
-        # read_csv = list(csv.reader(csvfile, delimiter=','))
-        # csvWriter is for writing new info to the list
-        csv_writer = csv.writer(csvfile)
+    #  readCSV is a list that can be accessed readCSV[row][col]
+    # read_csv = list(csv.reader(csvfile, delimiter=','))
+    # csvWriter is for writing new info to the list
+    csv_writer = csv.writer(csvfile)
+    csv_writer.writerow(['Song ID', 'Artist', 'Title', 'Favorites', 'Plays','Plays/Likes'])
 
-    # c.writerow(['Song ID', 'Artist', 'Title', 'Favorites', 'Plays','Plays/Likes'])
-    # print("entering for loop")
-        for key, value in data.items():
-            if newSongList.__contains__(key):
-                # TO Write
-                print "Writing song: ", key, value
-                csv_writer.writerow([key] + value)
+    for song in songlist:
+        csv_writer.writerow([song.id, song.artist, song.title, song.get_favorite_count(date), song.get_play_count(date)] )
 
 
 def read_pickle_file():
@@ -122,6 +117,18 @@ def write_pickle_file(full_list):
     f.close()
 
 
+def print_all_dates(listofsongs):
+
+    dates = []
+    # Loop to add all keys to a list without duplicates
+    for song in listofsongs:
+        for x in song.song_data.keys():
+            if x not in dates:
+                dates.append(x)
+    print ' '
+    print "Dates to choose from", dates
+
+
 def main():
 
     final_song_list = []
@@ -130,19 +137,20 @@ def main():
     # Determine the new likes from soundCloud, oldSongList is passed in as a comparison
     determine_new_songs(oldSongList)
 
-    print ' '
-    print "New Song List: ", newSongList
-    print "Old Song List: ", oldSongList
-    print ' '
     final_song_list = oldSongList + newSongList
     # Collect new information for all the songs
+    print "Updating Information... "
     for song in final_song_list:
         song.add_information()
     print " "
     write_pickle_file(final_song_list)
 
+    print_all_dates(final_song_list)
+
+    date = raw_input("Enter a date to view:  DD-MM-YYYY ")
+
     # write the new songs to the spreadsheet
-    # write_nw_songs()
+    write_new_songs(final_song_list, date)
 
 if __name__ == '__main__':
 

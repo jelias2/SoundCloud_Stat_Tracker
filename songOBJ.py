@@ -61,7 +61,6 @@ def main():
     stopper = 0
 
     for item in my_likes:
-
         if stopper is 3:
             break
         try:
@@ -93,8 +92,6 @@ def main():
         print "Artist: ", song.artist
         print "Favorites: ", song.get_favorite_count(date)
         print "Plays: ", song.get_play_count(date)
-
-
 
 if __name__ == '__main__':
     print ' '
