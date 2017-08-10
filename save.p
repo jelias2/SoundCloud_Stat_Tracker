@@ -777,4 +777,32 @@ p11
 VTakeoff - Unleashed (Prod. By OG Parker)
 p12
 sba.(lp1
-.
+.(lp1
+.(lp1
+.(lp1
+.(lp1
+.(lp1
+(isongOBJ
+songObject
+p2
+(dp3
+S'song_data'
+p4
+(dp5
+S'10-08-2017'
+p6
+(lp7
+I83988
+aI6022627
+assS'artist'
+p8
+VTravis Scott
+p9
+sS'id'
+p10
+I163746353
+sS'title'
+p11
+V11 Grey
+p12
+sba.
