@@ -27,10 +27,10 @@ class songObject:
 
         # Check if the date already exits in the dictionary, if not add
         if date in self.song_data:
-            print "Date ", date, " is already in ", self.title
+            # print "Date ", date, " is already in ", self.title
+            ' ' # Blank space to avoid python error
         else:
             print "Adding ", date, " to song ", self.title
-
             try:
                 track_info = client.get('/tracks/{}'.format(self.id))
                 # favorites = track_info.favoritings_count

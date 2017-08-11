@@ -17,7 +17,28 @@ newSongList = []
 oldSongList = []
 
 
-def determine_new_songs( comparison_list ):
+def menu():
+
+    runMenu = "false"
+
+    while runMenu == 'false':
+        menu_option = ['c', 'd', 'r', 'q']
+        print " "
+        print '-------------------------------'
+        print '[C]ompare two dates'
+        print '[D]isplay stats from single day'
+        print '[R]emove a song from saved list'
+        print '[Q]uit   '
+        print '-------------------------------'
+        print ' '
+        user_in = raw_input("What would you like to do ?   ")
+
+        if user_in.lower() in menu_option:
+            runMenu = 'true'
+            return user_in
+
+
+def determine_new_songs(comparison_list):
     # Create dictionary of Links
     # The song ID maps to a string of all of the info
     for item in my_likes:
@@ -76,7 +97,7 @@ def determine_new_songs( comparison_list ):
     #             newSongList.append(obj)
 
 
-def write_new_songs(songlist, date):
+def write_songs(songlist, date):
     print' '
     print "Writing new songs to spreadsheet..."
     csvfile = open('/Users/JacobElias/Desktop/Projects/SoundProgram/data2.csv', 'w')
@@ -85,10 +106,44 @@ def write_new_songs(songlist, date):
     # read_csv = list(csv.reader(csvfile, delimiter=','))
     # csvWriter is for writing new info to the list
     csv_writer = csv.writer(csvfile)
+    title = "Displaying stats from" + date
+    csv_writer.writerow([' ', ' ', title])
     csv_writer.writerow(['Song ID', 'Artist', 'Title', 'Favorites', 'Plays','Plays/Likes'])
 
     for song in songlist:
         csv_writer.writerow([song.id, song.artist, song.title, song.get_favorite_count(date), song.get_play_count(date)] )
+
+
+def compare_songs(songlist, date1, date2):
+        print' '
+        print "Writing new songs to spreadsheet..."
+        csvfile = open('/Users/JacobElias/Desktop/Projects/SoundProgram/data2.csv', 'w')
+
+        #  readCSV is a list that can be accessed readCSV[row][col]
+        # read_csv = list(csv.reader(csvfile, delimiter=','))
+        # csvWriter is for writing new info to the list
+        csv_writer = csv.writer(csvfile)
+        #Format a string for the "title" for the spread sheet
+        title = "Comparison between " + date1 + " and " + date2
+        csv_writer.writerow([' ', ' ', title])
+        csv_writer.writerow(['Song ID', 'Artist', 'Title', 'Favorites growth', 'Play growth', 'Plays/Likes'])
+
+        for song in songlist:
+            fav_growth = calculate_percent_growth( song.get_favorite_count(date1), song.get_favorite_count(date2))
+            play_growth = calculate_percent_growth( song.get_play_count(date1), song.get_play_count(date2))
+
+            csv_writer.writerow([song.id,
+                                 song.artist,
+                                 song.title,
+                                 fav_growth + '%'
+                                 , play_growth + '%'])
+
+
+def calculate_percent_growth(past_number, future_number):
+    diff = float(future_number) - float(past_number)
+    percent = diff / past_number
+    format_percent = format(percent, '.2f')
+    return format_percent
 
 
 def read_pickle_file():
@@ -126,9 +181,9 @@ def print_all_dates(listofsongs):
     print ' '
     print "Dates to choose from", dates
 
+    return dates
 
 def main():
-
     final_song_list = []
     # Read in the stored songs
     read_pickle_file()
@@ -137,24 +192,61 @@ def main():
 
     final_song_list = oldSongList + newSongList
     # Collect new information for all the songs
-    print "Updating Information... "
     for song in final_song_list:
         song.add_information()
-    print " "
-
     print "Finding new songs..."
     write_pickle_file(final_song_list)
 
-    print_all_dates(final_song_list)
+    user_choice = menu()
 
-    date = raw_input("Enter a date to view:  DD-MM-YYYY ")
+    if user_choice.lower().strip() == 'd':
+        valid_date_list = print_all_dates(final_song_list)
 
-    # write the new songs to the spreadsheet
-    write_new_songs(final_song_list, date)
+        valid_date_1 = 'false'
+        while valid_date_1 == 'false':
+            date1 = raw_input("Enter a date to view:  DD-MM-YYYY ")
+
+            if date1 in valid_date_list:
+                valid_date_1 = 'true'
+            else:
+                print 'Date was not valid'
+
+        # write the new songs to the spreadsheet
+        write_songs(final_song_list, date1)
+
+    if user_choice.lower().strip() == 'q':
+        print 'Quiting...peace'
+
+    if user_choice.lower().strip() == 'c':
+
+        valid_date_list = print_all_dates(final_song_list)
+
+        valid_date_1 = 'false'
+        while valid_date_1 == 'false':
+            date1 = raw_input("Enter first date:  DD-MM-YYYY ")
+            if date1 in valid_date_list:
+                valid_date_1 = 'true'
+            else:
+                print 'Date was not valid'
+
+        valid_date_2 = 'false'
+        while valid_date_2 == 'false':
+                date2 = raw_input("Enter second date: DD-MM-YYYY ")
+                if date2 in valid_date_list:
+                    valid_date_2 = 'true'
+                if date2 == date1:
+                    print 'Date 1 and date 2 were the same. Please enter another second date'
+                    valid_date_2 = 'false'
+                elif valid_date_2 == 'false':
+                    print 'Date 2 was not valid'
+
+        compare_songs(final_song_list, date1, date2)
+
 
 if __name__ == '__main__':
 
     print("Starting...")
+    print "Updating Information... "
 
     main()
 
