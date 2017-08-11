@@ -23,7 +23,7 @@ class songObject:
 
         # "Method to add soundcloud information from a specific date to a song"
         today = datetime.date.today()
-        date = today.strftime('%d-%m-%Y')
+        date = today.strftime('%m-%d-%Y')
 
         # Check if the date already exits in the dictionary, if not add
         if date in self.song_data:
@@ -69,7 +69,7 @@ def main():
             song_id = item.id
             song_title = track_info.title
 
-            song = songObject(username, song_id, song_title, )
+            song = songObject(song.title, song_id, username )
 
             song.add_information()
 

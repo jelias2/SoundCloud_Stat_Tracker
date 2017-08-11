@@ -22,12 +22,12 @@ def menu():
     runMenu = "false"
 
     while runMenu == 'false':
-        menu_option = ['c', 'd', 'r', 'q']
+        menu_option = ['c', 'd', 'q', ]
         print " "
         print '-------------------------------'
         print '[C]ompare two dates'
         print '[D]isplay stats from single day'
-        print '[R]emove a song from saved list'
+       # print '[R]emove a song from saved list'
         print '[Q]uit   '
         print '-------------------------------'
         print ' '
@@ -106,17 +106,22 @@ def write_songs(songlist, date):
     # read_csv = list(csv.reader(csvfile, delimiter=','))
     # csvWriter is for writing new info to the list
     csv_writer = csv.writer(csvfile)
-    title = "Displaying stats from" + date
+    title = "Displaying stats from " + date
     csv_writer.writerow([' ', ' ', title])
     csv_writer.writerow(['Song ID', 'Artist', 'Title', 'Favorites', 'Plays','Plays/Likes'])
 
     for song in songlist:
-        csv_writer.writerow([song.id, song.artist, song.title, song.get_favorite_count(date), song.get_play_count(date)] )
+        try:
+            csv_writer.writerow([song.id, song.artist, song.title, song.get_favorite_count(date), song.get_play_count(date)] )
+        except TypeError:
+            print song.title, "does not contain info from", date, "and will not be written to spread sheet"
+            # print "ID:", song.id, "title:", song.title, "Artist:", song.artist, "Does not contain info from", date
 
 
 def compare_songs(songlist, date1, date2):
         print' '
         print "Writing new songs to spreadsheet..."
+        print ' '
         csvfile = open('/Users/JacobElias/Desktop/Projects/SoundProgram/data2.csv', 'w')
 
         #  readCSV is a list that can be accessed readCSV[row][col]
@@ -129,26 +134,29 @@ def compare_songs(songlist, date1, date2):
         csv_writer.writerow(['Song ID', 'Artist', 'Title', 'Favorites growth', 'Play growth', 'Plays/Likes'])
 
         for song in songlist:
-            fav_growth = calculate_percent_growth( song.get_favorite_count(date1), song.get_favorite_count(date2))
-            play_growth = calculate_percent_growth( song.get_play_count(date1), song.get_play_count(date2))
+            try:
+                fav_growth = calculate_percent_growth( song.get_favorite_count(date1), song.get_favorite_count(date2))
+                play_growth = calculate_percent_growth( song.get_play_count(date1), song.get_play_count(date2))
 
-            csv_writer.writerow([song.id,
-                                 song.artist,
-                                 song.title,
-                                 fav_growth + '%'
-                                 , play_growth + '%'])
+                csv_writer.writerow([song.id,
+                                     song.artist,
+                                     song.title,
+                                     fav_growth + '%'
+                                     , play_growth + '%'])
+            except TypeError:
+                print song.title, "will not be printed because it does not contain information from ", date1
 
 
 def calculate_percent_growth(past_number, future_number):
     diff = float(future_number) - float(past_number)
     percent = diff / past_number
-    format_percent = format(percent, '.2f')
+    format_percent = format(percent, '.3f')
     return format_percent
 
 
 def read_pickle_file():
-    f = open("save.p", 'r')  # Pickle file to load a save data
-    if (os.stat("save.p")).st_size != 0:  # Check to make sure the file is not empty
+    f = open("savedSongs.p", 'r')  # Pickle file to load a save data
+    if (os.stat("savedSongs.p")).st_size != 0:  # Check to make sure the file is not empty
         while 1:
             try:
                 oldSongList.extend(pickle.load(f))
@@ -160,12 +168,14 @@ def read_pickle_file():
 def write_pickle_file(full_list):
 
     if newSongList.__len__() == 0:
+        print ' '
         print 'No new songs to add'
 
     for x in newSongList:
-        print 'Adding ', x.title, ' to pickle file'
+        print ' '
+        print 'Adding ', x.title, ' to program memory'
 
-    f = open("save.p", 'w')   # Save song_list data to a pickle file
+    f = open("savedSongs.p", 'w')   # Save song_list data to a pickle file
     pickle.dump(full_list, f)
     f.close()
 
@@ -182,6 +192,21 @@ def print_all_dates(listofsongs):
     print "Dates to choose from", dates
 
     return dates
+
+
+def rewrite_pickle(song_list):
+
+    for song in song_list:
+        if song.id == 337302890:
+            print 'removed', song.title
+            song_list.remove(song)
+
+    print_all_dates(song_list)
+
+    f = open("savedSongs.p", 'w')   # Save song_list data to a pickle file
+    pickle.dump(song_list, f)
+    f.close()
+
 
 def main():
     final_song_list = []
@@ -223,7 +248,7 @@ def main():
 
         valid_date_1 = 'false'
         while valid_date_1 == 'false':
-            date1 = raw_input("Enter first date:  DD-MM-YYYY ")
+            date1 = raw_input("Enter first date:  MM-DD-YYYY ")
             if date1 in valid_date_list:
                 valid_date_1 = 'true'
             else:
@@ -231,7 +256,7 @@ def main():
 
         valid_date_2 = 'false'
         while valid_date_2 == 'false':
-                date2 = raw_input("Enter second date: DD-MM-YYYY ")
+                date2 = raw_input("Enter second date: MM-DD-YYYY ")
                 if date2 in valid_date_list:
                     valid_date_2 = 'true'
                 if date2 == date1:
@@ -242,6 +267,9 @@ def main():
 
         compare_songs(final_song_list, date1, date2)
 
+
+    # if user_choice.lower().strip() == 'v':
+    #     rewrite_pickle(final_song_list)
 
 if __name__ == '__main__':
 
