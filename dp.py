@@ -3,6 +3,7 @@ import csv
 import cPickle as pickle
 import sys
 import os
+import urllib2
 from songOBJ import songObject
 
 reload(sys)
@@ -15,6 +16,19 @@ data = {}
 # Create list of newSong and oldSong
 newSongList = []
 oldSongList = []
+
+
+def update():
+    read_pickle_file()
+    # Determine the new likes from soundCloud, oldSongList is passed in as a comparison
+    determine_new_songs(oldSongList)
+
+    final_song_list = oldSongList + newSongList
+    # Collect new information for all the songs
+    for song in final_song_list:
+        song.add_information()
+    print "Finding new songs..."
+    write_pickle_file(final_song_list)
 
 
 def menu():
@@ -150,6 +164,7 @@ def compare_songs(songlist, date1, date2):
 def calculate_percent_growth(past_number, future_number):
     diff = float(future_number) - float(past_number)
     percent = diff / past_number
+    percent = percent * 100
     format_percent = format(percent, '.3f')
     return format_percent
 
@@ -172,7 +187,6 @@ def write_pickle_file(full_list):
         print 'No new songs to add'
 
     for x in newSongList:
-        print ' '
         print 'Adding ', x.title, ' to program memory'
 
     f = open("savedSongs.p", 'w')   # Save song_list data to a pickle file
@@ -218,7 +232,12 @@ def main():
     final_song_list = oldSongList + newSongList
     # Collect new information for all the songs
     for song in final_song_list:
-        song.add_information()
+        try:
+            song.add_information()
+        except urllib2.HTTPError, err:
+            print "Could not add info to ", song.title, ": HTTP Request Error:", err.code
+            raise
+
     print "Finding new songs..."
     write_pickle_file(final_song_list)
 
@@ -271,12 +290,14 @@ def main():
     # if user_choice.lower().strip() == 'v':
     #     rewrite_pickle(final_song_list)
 
+
 if __name__ == '__main__':
 
     print("Starting...")
     print "Updating Information... "
 
     main()
+
 
     print ' '
     print("Completed")

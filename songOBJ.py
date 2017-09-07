@@ -2,6 +2,8 @@ import datetime
 import os
 from datetime import timedelta
 import soundcloud
+import urllib2
+import requests
 import cPickle as pickle
 
 song_list = []
@@ -28,7 +30,7 @@ class songObject:
         # Check if the date already exits in the dictionary, if not add
         if date in self.song_data:
             # print "Date ", date, " is already in ", self.title
-            ' ' # Blank space to avoid python error
+            ' '  # Blank space to avoid python error
         else:
             print "Adding ", date, " to song ", self.title
             try:
@@ -37,8 +39,10 @@ class songObject:
                 # plays = track_info.playback_count
                 self.song_data[date] = [track_info.favoritings_count, track_info.playback_count]
 
-            except AttributeError:
+            except (AttributeError, requests.exceptions.HTTPError):
                 pass
+                print "Could not add info to ", self.title, ": HTTP Request Error:"
+
 
     def print_dates(self):
             # Method to show all the dates in a song
